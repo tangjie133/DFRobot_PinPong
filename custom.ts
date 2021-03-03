@@ -95,7 +95,7 @@ namespace pinpong {
      * LED灯控制
      */
     //% weight=98
-    //% blockId=pinpong_LED block="%color LED True %state"
+    //% blockId=pinpong_LED block="LED %color True %state"
     export function LED(color:LED, state:SWITCH){
         let buf=pins.createBuffer(2);
         buf[0]=color;
@@ -196,7 +196,7 @@ namespace pinpong {
 
     //% weight=91
     //% block="init display"
-    export function microIoT_initDisplay(): void {
+    export function initDisplay(): void {
         OLEDcmd(0xAE);  // Set display OFF
         OLEDcmd(0xD5);  // Set Display Clock Divide Ratio / OSC Frequency 0xD4
         OLEDcmd(0x80);  // Display Clock Divide Ratio / OSC Frequency 
@@ -252,7 +252,7 @@ namespace pinpong {
     //% line.min=0 line.max=7
     //% column.min=0 column.max=16
     //% block="OLED show text %text on line %line column %column"
-    export function microIoT_showUserText(text: string,line: number,column:number): void {
+    export function OLEDshowUserText(text: string,line: number,column:number): void {
         OLEDsetText(line, column);
         if(text.length>16){
             let newtext = text.substr(0,16);
@@ -283,7 +283,7 @@ namespace pinpong {
     //% block="OLED show number %n on line %line column %column"
 
     export function OLEDshowUserNumber(n: number,line: number, column:number): void {
-        pinpong.microIoT_showUserText("" + n,line, column);
+        pinpong.OLEDshowUserText("" + n,line, column);
     }
 
     /**
@@ -447,14 +447,14 @@ namespace pinpong {
     
     //% weight=86
     //% blockId=IR_read block="read IR key value"
-    export function IR_readV2(): number {
+    export function IR_read(): number {
         return irCode()&0x00ff;
     }
 
     //% weight=85
     //% blockId=IR_callbackUser block="on IR received"
     //% draggableParameters
-    export function IR_callbackUserV2(cb: (message: number) => void) {
+    export function IR_callbackUser(cb: (message: number) => void) {
         state = 1;
         control.onEvent(11, 22, function() {
             cb(irstate)
