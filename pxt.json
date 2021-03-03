@@ -15,7 +15,8 @@
         "sendBuffer.asm",
         "ws2812b.ts",
         "NecIR.cpp",
-        "_locales/zh-cn/DFRobot_PinPong-strings.json"
+        "_locales/zh-cn/DFRobot_PinPong-strings.json",
+        "shims.d.ts"
     ],
     "testFiles": [
         "test.ts"
