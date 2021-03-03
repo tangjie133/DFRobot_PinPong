@@ -17,7 +17,7 @@ enum MOTOR {
 
 enum DIRECTION {
     //% block="CW"
-    CW=0X0,
+    CW=0X00,
     //% block="CCW"
     CCW=0X01
 }
@@ -46,16 +46,25 @@ enum STATE{
 }
 
 enum RELAY{
-    //% block="close"
+    //% block="Close"
     CLOSE,
-    //% block="discon"
+    //% block="Discon"
     DISCON
+}
+enum AHT20{
+    //% block="Temperature"
+    TEMP,
+    //% block="Humidity"
+    HUM
+
 }
 
 //% weight=100 color=#0fbc11 icon="" block="PinPong"
 namespace pinpong {
 
     const i2cAddr = 0x10;
+    let irstate:number;
+    let state:number;
   /**
    * 电机运行
    */
@@ -63,10 +72,11 @@ namespace pinpong {
     //% blockId=pinpong_motorRun block="motor %index move %dir at speed %speed"
     //% speed.min=0 speed.max=255
     export function motorRun(index:MOTOR, dir:DIRECTION, speed:number): void {
-        pins.i2cWriteNumber(i2cAddr, index, NumberFormat.Int8LE)
-        let buf=pins.createBuffer(2);
-        buf[0]=dir;
+        //pins.i2cWriteNumber(i2cAddr, index, NumberFormat.Int8LE)
+        let buf=pins.createBuffer(3);
+        buf[0]=index;
         buf[1]=speed;
+        buf[2]=dir;
         pins.i2cWriteBuffer(i2cAddr, buf)
     }
     /**
@@ -96,8 +106,8 @@ namespace pinpong {
      * 读取电位器数据
      */
     //% weight=97
-    //% blockId=pinpong_getPotentiometer block="read potentiometer number"
-    export function readPotentiometer():number{
+    //% blockId=pinpong_readAngle block="read angle number"
+    export function readAngle():number{
         pins.i2cWriteNumber(i2cAddr, 0X0B, NumberFormat.Int8LE);
         let buf = pins.i2cReadBuffer(i2cAddr, 2)
         let data =buf[0]<<8|buf[1]; 
@@ -107,8 +117,8 @@ namespace pinpong {
      * 读取火焰传感器数据
      */
     //% weight=96
-    //% blockId=pinpong_readFlame block="read flame sensor number"
-    export function readFlame():number{
+    //% blockId=pinpong_readFlame block="read flre sensor number"
+    export function readFlre():number{
         pins.i2cWriteNumber(i2cAddr, 0x0D, NumberFormat.Int8LE);
         let buf = pins.i2cReadBuffer(i2cAddr, 2);
         let data = buf[0]<<8|buf[1];
@@ -134,7 +144,7 @@ namespace pinpong {
      * 获取LED灯状态
      */
     //% weight=94
-    //%blockId=pinpong_LDEState block="%color state"
+    //%blockId=pinpong_LDEState block="%color LED state"
     export function LEDState(color:LED):number{
         pins.i2cWriteNumber(i2cAddr, color, NumberFormat.Int8LE);
         return pins.i2cReadNumber(i2cAddr, NumberFormat.Int8LE);
@@ -212,24 +222,9 @@ namespace pinpong {
         OLEDcmd(0xAF);  // Set display On
         OLEDclear();
     }
-    /**
-     * OLED clear
-     */
-    //% weight=90
-    //% block="clear OLED"
-    export function OLEDclear() {
-        for (let j = 0; j < 8; j++) {
-            OLEDsetText(j, 0);
-            {
-                for (let i = 0; i < 16; i++)  //clear all columns
-                {
-                    OLEDputChar(' ');
-                }
-            }
-        }
-        OLEDsetText(0, 0);
-    }
+    
 
+    
     function OLEDsetText(row: number, column: number) {
         let r = row;
         let c = column;
@@ -252,35 +247,71 @@ namespace pinpong {
      * @param text value , eg: DFRobot
      * OLED  display string
      */
-    //% weight=89
+    //% weight=90
     //% text.defl="DFRobot"
     //% line.min=0 line.max=7
-    //% block="OLED show text %text|on line %line"
-    export function microIoT_showUserText(line: number, text: string): void {
-        OLEDsetText(line, 0);
-        for (let c of text) {
-            OLEDputChar(c);
+    //% column.min=0 column.max=16
+    //% block="OLED show text %text on line %line column %column"
+    export function microIoT_showUserText(text: string,line: number,column:number): void {
+        OLEDsetText(line, column);
+        if(text.length>16){
+            let newtext = text.substr(0,16);
+            for (let c of newtext)
+                OLEDputChar(c);
+        }else{
+            if(text.length>(16-column)){
+                let newtext = text.substr(0,(16-column));
+                for (let c of newtext)
+                    OLEDputChar(c);
+            }else{
+                for (let c of text)
+                    OLEDputChar(c);
+            }
+            
         }
-
-        for (let i = text.length; i < 16; i++) {
-            OLEDsetText(line, i);
-            OLEDputChar(" ");
-        }
-
+        
+        
     }
 	/**
      * @param line line num (8 pixels per line), eg: 0
      * @param n value , eg: 2019
      * OLED  shows the number
      */
-    //% weight=88
+    //% weight=89
     //% line.min=0 line.max=7
-    //% block="OLED show number %n|on line %line"
+    //% column.min=0 column.max=16
+    //% block="OLED show number %n on line %line column %column"
 
-    export function OLEDshowUserNumber(line: number, n: number): void {
-        pinpong.microIoT_showUserText(line, "" + n)
+    export function OLEDshowUserNumber(n: number,line: number, column:number): void {
+        pinpong.microIoT_showUserText("" + n,line, column);
     }
 
+    /**
+     * OLED clear
+     */
+    //% weight=88
+    //% block="clear OLED"
+    export function OLEDclear() {
+        for (let j = 0; j < 8; j++) {
+            OLEDsetText(j, 0);
+                for (let i=0; i < 16; i++)  //clear all columns
+                {
+                    OLEDputChar(' ');
+                }
+        }
+        OLEDsetText(0, 0);
+    }
+    //% weight=87
+    //% block="clear OLED line %line %column1 to %column2 column"
+    //% line.min=0 line.max=7
+    //% column1.min=0 column1.max=16
+    //% column2.min=0 column2.max=16
+    export function clear(line:number,column1:number,column2:number){
+        OLEDsetText(line, column1);
+        for (let i=0; i < (column2-column1); i++) {
+                    OLEDputChar(' ');
+        }
+    }
 
     function OLEDwriteCustomChar(c: string) {
         for (let i = 0; i < 8; i++) {
@@ -406,12 +437,167 @@ namespace pinpong {
     for (let i = 0; i < 16 * 3; i++) {
         neopixel_buf[i] = 0
     }
-    /**
-     * TODO: describe your function here
-     * @param value describe value here, eg: 5
-     */
-    //% block
-    export function fib(value: number): number {
-        return value <= 1 ? value : fib(value -1) + fib(value - 2);
+   /**
+    * 红外
+    */
+    //% advanced=true shim=maqueenIRV2::irCode
+    function irCode(): number {
+        return 0;
     }
+    
+    //% weight=86
+    //% blockId=IR_read block="read IR key value"
+    export function IR_readV2(): number {
+        return irCode()&0x00ff;
+    }
+
+    //% weight=85
+    //% blockId=IR_callbackUser block="on IR received"
+    //% draggableParameters
+    export function IR_callbackUserV2(cb: (message: number) => void) {
+        state = 1;
+        control.onEvent(11, 22, function() {
+            cb(irstate)
+        }) 
+    }
+    
+    basic.forever(() => {
+        if(state == 1){
+            irstate = irCode()&0x00ff;
+            if(irstate != -1){
+                control.raiseEvent(11, 22)
+            }
+        }
+        
+        basic.pause(20);
+    })
+     /** 
+     * Set the three primary color:red, green, and blue
+     */
+    //% weight=84
+    //% r.min=0 r.max=255
+    //% g.min=0 g.max=255
+    //% b.min=0 b.max=255
+    //%  block="red|%r green|%g blue|%b"
+    export function rgb(r: number, g: number, b: number): number {
+        return (r << 16) + (g << 8) + (b);
+    }
+
+    /**
+     * RGB LEDs light up from A to B 
+     */
+    //% weight=83
+    //% from.min=1 from.max=2
+    //% to.min=1 to.max=2
+    //% to.defl=2
+    //% from.defl=1
+    //%  block="RGB LEDs |%from to|%to"
+    export function ledRange(from: number, to: number): number {
+        let _from=from-1;
+        let _to=to;
+        return (_from << 16) + (2 << 8) + (_to);
+    }
+    /**
+     * Set the color of the specified LEDs
+     */
+    //% weight=82
+    //% index.min=1 index.max=2
+    //% index.defl=1
+    //% rgb.shadow="colorNumberPicker"
+    //%  block="RGB LED |%index show color|%rgb"
+    export function setIndexColor(index: number, rgb: number) {
+        let f = index-1;
+        let t = index-1;
+        let r = (rgb >> 16) * (_brightness / 255);
+        let g = ((rgb >> 8) & 0xFF) * (_brightness / 255);
+        let b = ((rgb) & 0xFF) * (_brightness / 255);
+
+        if ((index-1) > 15) {
+            if ((((index-1) >> 8) & 0xFF) == 0x02) {
+                f = (index-1) >> 16;
+                t = (index-1) & 0xff;
+            } else {
+                f = 0;
+                t = -1;
+            }
+        }
+        for (let i = f; i <= t; i++) {
+            neopixel_buf[i * 3 + 0] = Math.round(g)
+            neopixel_buf[i * 3 + 1] = Math.round(r)
+            neopixel_buf[i * 3 + 2] = Math.round(b)
+        }
+        ws2812b.sendBuffer(neopixel_buf, DigitalPin.P15)
+
+    }
+    /**
+        * Set the color of all RGB LEDs
+        */
+    //% weight=81
+    //% rgb.shadow="colorNumberPicker"
+    //%  block="show color |%rgb"
+    export function showColor(rgb: number) {
+        let r = (rgb >> 16) * (_brightness / 255);
+        let g = ((rgb >> 8) & 0xFF) * (_brightness / 255);
+        let b = ((rgb) & 0xFF) * (_brightness / 255);
+        for (let i = 0; i < 16 * 3; i++) {
+            if ((i % 3) == 0)
+                neopixel_buf[i] = Math.round(g)
+            if ((i % 3) == 1)
+                neopixel_buf[i] = Math.round(r)
+            if ((i % 3) == 2)
+                neopixel_buf[i] = Math.round(b)
+        }
+        ws2812b.sendBuffer(neopixel_buf, DigitalPin.P15)
+    }
+    /**
+     * Set the brightness of RGB LED
+     */
+    //% weight=80
+    //% brightness.min=0 brightness.max=255
+    //% block="set brightness to |%brightness"
+    export function setBrightness(brightness: number) {
+        _brightness = brightness;
+    }
+    /**
+     * Turn off all RGB LEDs
+     */
+    //% weight=79
+    //%  block="clear all LEDs"
+    export function ledBlank() {
+        showColor(0)
+    }
+    /**
+     * 温湿度
+     */
+    //% weight=78
+    //% block="AHT20 Init"
+    export function AHT20Init(){
+        pins.i2cWriteNumber(0x38, 0xBA, NumberFormat.Int8LE);
+        let data=pins.i2cReadNumber(0x38, NumberFormat.Int8LE);
+        if((data & 0x08) != 1){
+        let buf=pins.createBuffer(3)
+            buf[0]=0xBE;
+            buf[1]=0X08;
+            buf[2]=0x00;
+            pins.i2cWriteBuffer(0x38, buf)
+        }
+    }
+    //% weight=77
+    //% block="read %state"
+    export function readAHT20(state:AHT20):number{
+        let buf=pins.createBuffer(3);
+            buf[0]=0xAC;
+            buf[1]=0X33;
+            buf[2]=0x00;
+            pins.i2cWriteBuffer(0x38, buf);
+        let buf1=pins.i2cReadBuffer(0x38, 7);
+        let data;
+        switch(state){
+            case AHT20.HUM:data=((buf1[1] << 12) + (buf1[2] << 4) + (buf1[3] >> 4)) / 1048576 * 100, 2;break;
+            case AHT20.TEMP:data=(((buf1[3] & 0x0f) << 16) + (buf1[4] << 8) + (buf1[5])) / 1048576 * 200 - 50, 2;break;
+            default:break;
+        }
+        return Math.round(data);
+    }
+    
 }
