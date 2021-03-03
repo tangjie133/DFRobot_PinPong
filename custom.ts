@@ -63,10 +63,10 @@ namespace pinpong {
     //% blockId=pinpong_motorRun block="motor %index move %dir at speed %speed"
     //% speed.min=0 speed.max=255
     export function motorRun(index:MOTOR, dir:DIRECTION, speed:number): void {
-        let buf=pins.createBuffer(3);
-        buf[0]=index;
-        buf[1]=dir;
-        buf[2]=speed;
+        pins.i2cWriteNumber(i2cAddr, index, NumberFormat.Int8LE)
+        let buf=pins.createBuffer(2);
+        buf[0]=dir;
+        buf[1]=speed;
         pins.i2cWriteBuffer(i2cAddr, buf)
     }
     /**
