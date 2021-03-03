@@ -11,7 +11,7 @@
         "main.blocks",
         "main.ts",
         "README.md",
-        "pinpong.ts",
+        "custom.ts",
         "sendBuffer.asm",
         "ws2812b.ts",
         "NecIR.cpp",
