@@ -11,7 +11,11 @@
         "main.blocks",
         "main.ts",
         "README.md",
-        "custom.ts"
+        "custom.ts",
+        "sendBuffer.asm",
+        "ws2812b.ts",
+        "NecIR.cpp",
+        "_locales/zh-cn/DFRobot_PinPong-strings.json"
     ],
     "testFiles": [
         "test.ts"
