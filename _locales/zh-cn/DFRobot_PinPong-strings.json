@@ -16,7 +16,7 @@
     "pinpong.AHT20Init|block":"初始化AHT20",
     "pinpong.motorRun|block":"电机 %index 方向 %dir 速度 %speed",
     "pinpong.motorStop|block":"电机 %index 停止",
-    "pinpong.LED|block":"LED %color %state",
+    "pinpong.LED|block":"红色LED灯 %state 黄色LED灯 %state1 绿色LED灯 %state2",
     "pinpong.readAngle|block":"读取电位器数据",
     "pinpong.readFlre|block":"读取火焰传感器数据",
     "pinpong.motorState|block":"电机 %motor 状态 %state",

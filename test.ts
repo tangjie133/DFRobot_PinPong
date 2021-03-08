@@ -54,20 +54,7 @@ basic.forever(function () {
     pinpong.motorRun(MOTOR.M1, DIRECTION.CCW, 50)
     basic.pause(1000)
 })
-basic.forever(function () {
-    pinpong.LED(LED.RD, SWITCH.ON)
-    basic.pause(100)
-    pinpong.LED(LED.YW, SWITCH.ON)
-    basic.pause(100)
-    pinpong.LED(LED.GN, SWITCH.ON)
-    basic.pause(100)
-    pinpong.LED(LED.RD, SWITCH.OFF)
-    basic.pause(100)
-    pinpong.LED(LED.YW, SWITCH.OFF)
-    basic.pause(100)
-    pinpong.LED(LED.GN, SWITCH.OFF)
-    basic.pause(100)
-})
+
 basic.forever(function () {
     pinpong.clear(4, 3, 6)
     pinpong.OLEDshowUserText("AE:" + pinpong.readAngle(), 4, 0)

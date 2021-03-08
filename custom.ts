@@ -22,15 +22,6 @@ enum DIRECTION {
     CCW=0X01
 }
 
-enum LED {
-    //% block="Red"
-    RD=0X8,
-    //% block="Yellow"
-    YW=0X09,
-    //%block="Green"
-    GN=0X0A
-}
-
 enum SWITCH{
     //% block="ON"
     ON=0X01,
@@ -43,6 +34,15 @@ enum STATE{
     SPEED,
     //% block="Direction"
     DIR
+}
+
+enum LED {
+    //% block="Red"
+    RD=0X8,
+    //% block="Yellow"
+    YW=0X09,
+    //%block="Green"
+    GN=0X0A
 }
 
 enum RELAY{
@@ -95,11 +95,20 @@ namespace pinpong {
      * LED灯控制
      */
     //% weight=98
-    //% blockId=pinpong_LED block="LED %color True %state"
-    export function LED(color:LED, state:SWITCH){
+    //% state.min=0 state.max=1
+    //% state1.min=0 state1.max=1
+    //% state2.min=0 state2.max=1
+    //% blockId=pinpong_LED block="Red LED %state Yellow LED %state1 Green LED %state2"
+    export function LED(state:number,state1:number,state2:number){
         let buf=pins.createBuffer(2);
-        buf[0]=color;
+        buf[0]=0X8;
         buf[1]=state;
+        pins.i2cWriteBuffer(i2cAddr, buf);
+        buf[0]=0X09;
+        buf[1]=state1;
+        pins.i2cWriteBuffer(i2cAddr, buf);
+        buf[0]=0X0A;
+        buf[1]=state2;
         pins.i2cWriteBuffer(i2cAddr, buf);
     }
     /**
