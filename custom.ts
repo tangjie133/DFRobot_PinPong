@@ -259,7 +259,7 @@ namespace pinpong {
     //% weight=90
     //% text.defl="DFRobot"
     //% line.min=0 line.max=7
-    //% column.min=0 column.max=16
+    //% column.min=0 column.max=15
     //% block="OLED show text %text on line %line column %column"
     export function OLEDshowUserText(text: string,line: number,column:number): void {
         OLEDsetText(line, column);
@@ -288,7 +288,7 @@ namespace pinpong {
      */
     //% weight=89
     //% line.min=0 line.max=7
-    //% column.min=0 column.max=16
+    //% column.min=0 column.max=15
     //% block="OLED show number %n on line %line column %column"
 
     export function OLEDshowUserNumber(n: number,line: number, column:number): void {
@@ -311,14 +311,14 @@ namespace pinpong {
         OLEDsetText(0, 0);
     }
     //% weight=87
-    //% block="clear OLED line %line %column1 to %column2 column"
+    //% block="clear OLED line %line column %column1 to %column2"
     //% line.min=0 line.max=7
-    //% column1.min=0 column1.max=16
-    //% column2.min=0 column2.max=16
+    //% column1.min=0 column1.max=15
+    //% column2.min=0 column2.max=15
     export function clear(line:number,column1:number,column2:number){
         OLEDsetText(line, column1);
-        for (let i=0; i < (column2-column1); i++) {
-                    OLEDputChar(' ');
+        for (let i=0; i < ((column2-column1)+1); i++) {
+            OLEDputChar(' ');
         }
     }
 
