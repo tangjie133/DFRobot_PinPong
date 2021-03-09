@@ -34,7 +34,7 @@
     "pinpong.OLEDshowUserNumber|block": "OLED 显示数字 %n 在行 %line 列 %column",
     "pinpong.OLEDshowUserText|block": "OLED 显示文字 %text 在行 %line 列 %column",
     "pinpong.OLEDclear|block": "OLED清屏",
-    "pinpong.clear|block": "清除屏幕 行 %line 从列 %column1 到 %column2 列",
+    "pinpong.clear|block": "清除屏幕 行 %line 从 %column1 列到 %column2 列",
     "pinpong.IR_callbackUser|block":"当红外接收",
     "pinpong.IR_read|block":"获取红外键值"
     
