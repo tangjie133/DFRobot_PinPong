@@ -6,7 +6,9 @@ enum MOTOR {
     //% block="M3"
     M3=0X04,
     //%block="M4"
-    M4=0X06
+    M4=0X06,
+    //%block="ALL"
+    ALL=0X08
 }
 
 enum DIRECTION {
@@ -67,11 +69,30 @@ namespace pinpong {
     //% speed.min=0 speed.max=255
     export function motorRun(index:MOTOR, dir:DIRECTION, speed:number): void {
         //pins.i2cWriteNumber(i2cAddr, index, NumberFormat.Int8LE)
-        let buf=pins.createBuffer(3);
-        buf[0]=index;
-        buf[1]=speed;
-        buf[2]=dir;
-        pins.i2cWriteBuffer(i2cAddr, buf)
+        if(index != 0x08){
+            let buf=pins.createBuffer(3);
+            buf[0]=index;
+            buf[1]=speed;
+            buf[2]=dir;
+            pins.i2cWriteBuffer(i2cAddr, buf)
+        }else{
+            let buf=pins.createBuffer(3);
+            buf[0]=0x00;
+            buf[1]=speed;
+            buf[2]=dir;
+            pins.i2cWriteBuffer(i2cAddr, buf)
+            basic.pause(50)
+            buf[0]=0x02;
+            pins.i2cWriteBuffer(i2cAddr, buf)
+            basic.pause(50)
+            buf[0]=0x04;
+            pins.i2cWriteBuffer(i2cAddr, buf)
+            basic.pause(50)
+            buf[0]=0x06;
+            pins.i2cWriteBuffer(i2cAddr, buf)
+            basic.pause(50)
+        }
+        
     }
     /**
      * 控制电机停止
@@ -79,11 +100,29 @@ namespace pinpong {
     //% weight=99
     //% blockId=pinpong_motorStop block="motor %index stop"
     export function motorStop(index:MOTOR){
-        let buf=pins.createBuffer(3);
-        buf[0]=index;
-        buf[1]=0;
-        buf[2]=0;
-        pins.i2cWriteBuffer(i2cAddr, buf);
+        if(index != 0x08){
+            let buf=pins.createBuffer(3);
+            buf[0]=index;
+            buf[1]=0;
+            buf[2]=0;
+            pins.i2cWriteBuffer(i2cAddr, buf)
+        }else{
+            let buf=pins.createBuffer(3);
+            buf[0]=0x00;
+            buf[1]=0;
+            buf[2]=0;
+            pins.i2cWriteBuffer(i2cAddr, buf)
+            basic.pause(50)
+            buf[0]=0x02;
+            pins.i2cWriteBuffer(i2cAddr, buf)
+            basic.pause(50)
+            buf[0]=0x04;
+            pins.i2cWriteBuffer(i2cAddr, buf)
+            basic.pause(50)
+            buf[0]=0x06;
+            pins.i2cWriteBuffer(i2cAddr, buf)
+            basic.pause(50)
+        }
     }
     /**
      * 控制交通灯

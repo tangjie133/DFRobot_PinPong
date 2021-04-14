@@ -36,6 +36,7 @@
     "pinpong.OLEDclear|block": "清除显示屏全部数据",
     "pinpong.clear|block": "清除显示屏 行 %line 从 %column1 列到 %column2 列",
     "pinpong.IR_callbackUser|block":"当红外接收到数据时运行",
-    "pinpong.IR_read|block":"获取红外键值"
+    "pinpong.IR_read|block":"获取红外键值",
+    "MOTOR.ALL|block":"全部"
     
 }
