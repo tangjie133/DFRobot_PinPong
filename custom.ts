@@ -1,9 +1,3 @@
-
-/**
- * Use this file to define custom functions and blocks.
- * Read more at https://makecode.microbit.org/blocks/custom
- */
-
 enum MOTOR {
     //% block="M1"
     M1=0X00,
@@ -65,9 +59,9 @@ namespace pinpong {
     const i2cAddr = 0x10;
     let irstate:number;
     let state:number;
-  /**
-   * 电机运行
-   */
+    /**
+     * 控制电机运行
+     */
     //% weight=100
     //% blockId=pinpong_motorRun block="motor %index move %dir at speed %speed"
     //% speed.min=0 speed.max=255
@@ -80,7 +74,7 @@ namespace pinpong {
         pins.i2cWriteBuffer(i2cAddr, buf)
     }
     /**
-     * 电机停止
+     * 控制电机停止
      */
     //% weight=99
     //% blockId=pinpong_motorStop block="motor %index stop"
@@ -92,7 +86,7 @@ namespace pinpong {
         pins.i2cWriteBuffer(i2cAddr, buf);
     }
     /**
-     * LED灯控制
+     * 控制交通灯
      */
     //% weight=98
     //% state.min=0 state.max=1
@@ -112,7 +106,7 @@ namespace pinpong {
         pins.i2cWriteBuffer(i2cAddr, buf);
     }
     /**
-     * 读取电位器数据
+     * 获取旋转编码器数据
      */
     //% weight=97
     //% blockId=pinpong_readAngle block="read angle number"
@@ -123,7 +117,7 @@ namespace pinpong {
         return data;
     }
     /**
-     * 读取火焰传感器数据
+     * 获取火焰传感器数据
      */
     //% weight=96
     //% blockId=pinpong_readFlame block="read flre sensor number"
@@ -150,7 +144,7 @@ namespace pinpong {
         return data;
     }
     /**
-     * 获取LED灯状态
+     * 获取交通灯状态
      */
     //% weight=94
     //%blockId=pinpong_LDEState block="%color LED state"
@@ -159,7 +153,7 @@ namespace pinpong {
         return pins.i2cReadNumber(i2cAddr, NumberFormat.Int8LE);
     }
     /**
-     * 继电器控制
+     * 控制继电器
      */
     //% weight=93
     //%blockId=pinpong_setRelay block="%state relay"
@@ -171,7 +165,7 @@ namespace pinpong {
         }
     }
     /**
-     * 超声波
+     * 获取超声波数据
      */
     //%weight=92
     //% blockId=ultrasonic_sensor block="read ultrasonic sensor (cm)"
@@ -576,7 +570,7 @@ namespace pinpong {
         showColor(0)
     }
     /**
-     * 温湿度
+     * 初始化温湿度
      */
     //% weight=78
     //% block="AHT20 Init"
@@ -591,6 +585,9 @@ namespace pinpong {
             pins.i2cWriteBuffer(0x38, buf)
         }
     }
+    /**
+     * 获取温湿度数据
+     */
     //% weight=77
     //% block="read %state"
     export function readAHT20(state:AHT20):number{
